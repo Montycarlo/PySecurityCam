@@ -1,8 +1,10 @@
+#! /bin/python2
+
 import socket
 import time
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(('192.168.0.22', 5002))
+s.connect(('127.0.0.1', 5002))
 
 while 1:
     s.send("\n")
