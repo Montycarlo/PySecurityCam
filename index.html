@@ -1,0 +1,19 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, minimum-scale=0.1">
+		<title>webcam.jpg</title>
+	</head>
+	<body style="margin: 0px;">
+		<img id="webcam" style="-webkit-user-select: none" src="file:///tmp/webcam.jpg">
+	</body>
+
+<script>
+function load(){
+	var imgTag = document.getElementById("webcam");
+	imgTag.src = "file:///tmp/webcam.jpg?t="+Date.now();
+	setInterval(load, 1000);
+}
+load();
+</script>
+
+</html>

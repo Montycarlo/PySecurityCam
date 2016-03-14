@@ -7,13 +7,10 @@ import subprocess
 class VideoStream:
 
   def __init__(self):
-    self.__lock_frame = threading.Lock()
     self.__frame = ""
 
   def setFrame(self, f):
-    self.__lock_frame.acquire()
     self.__frame = f
-    self.__lock_frame.release()
 
   @property
   def frame(self):
@@ -27,7 +24,6 @@ class VideoStreamWorker(threading.Thread):
 
   def run(self):
     while 1:
-      print "*"*80
       PIPE = subprocess.PIPE
       p = subprocess.Popen("fswebcam -p YUYV -d /dev/video0 -i 0 -", shell=True, stderr=PIPE, stdout=PIPE)
       (out, err) = p.communicate()
@@ -50,10 +46,7 @@ class PictureSocket:
   def recv(self):
     while 1:
       chunk = self.__s.recv(2048)
-      if chunk == '\n':
-        #raise RuntimeError("socket connection broken")
-        break
-
+      if chunk == '\n': break
 
 class WorkThread(threading.Thread):
 
@@ -68,12 +61,12 @@ class WorkThread(threading.Thread):
       img = self.__video.frame
       self.__s.send("%d;%s"%(len(img), img))
 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('', 5002))
+s.listen(5)
+
 v = VideoStream()
 VideoStreamWorker(v).start()
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('', 5002)) # socket.gethostname()
-s.listen(5)
 
 while 1:
   print "listening..."
