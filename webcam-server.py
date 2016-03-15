@@ -4,6 +4,8 @@ import os
 import threading
 import subprocess
 
+LISTEN_PORT = 5000
+
 class VideoStream:
 
   def __init__(self):
@@ -40,7 +42,7 @@ class PictureSocket:
     while t < MSG_LEN:
       sent = self.__s.send(msg[t:])
       if sent == 0:
-        raise Exception("socket connection broken")
+        raise Exception("socket broken")
       t += sent
 
   def recv(self):
@@ -62,7 +64,7 @@ class WorkThread(threading.Thread):
       self.__s.send("%d;%s"%(len(img), img))
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('', 5002))
+s.bind(('', LISTEN_PORT))
 s.listen(5)
 
 v = VideoStream()
