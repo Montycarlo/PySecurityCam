@@ -1,5 +1,4 @@
 import socket
-import sys
 import os
 import threading
 import subprocess
@@ -101,7 +100,7 @@ class WorkThread(threading.Thread):
     while 1:
       self.__s.recv()
       img = self.__video.frame
-      self.__s.sendImg()
+      self.__s.sendImg(img)
 
 
 def main():
