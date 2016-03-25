@@ -10,14 +10,8 @@ CONNECT_PORT = 5000
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((CONNECT_IP, CONNECT_PORT))
 
-# open a SPIDER image and convert to byteformat
-#im = Image.open('slice001.hrs').convert2byte()
-
-# A root window for displaying objects
-# Convert the Image object into a TkPhoto object
-
 while 1:
-	s.send("\n")
+	#s.send("\n")
 
 	t = s.recv(2048)
 	i = t.find(";")
@@ -33,8 +27,5 @@ while 1:
 		b_len += len(t)
 		print "recvd %d/%d bytes" % (b_len, c)
 
-	print "Fin recv img"
-	f = open('/tmp/webcam.jpg', 'wb')
-	f.write(b)
-	f.close()
+  with f as open('/tmp/webcam.jpg', 'wb'): f.write(b)
 

@@ -16,7 +16,6 @@ canvas.pack()
 
 canvas.img = im
 canvasImg = canvas.create_image((0,0), image=im, anchor='nw')
-#Tkinter.Label(root, image=im).pack(side="bottom", fill="both", expand="yes")
 
 def callback(e):
 	img2 = ImageTk.PhotoImage(file=IMGPATH)
@@ -27,5 +26,3 @@ def callback(e):
 
 root.bind("<Return>", callback)
 root.mainloop()
-
-

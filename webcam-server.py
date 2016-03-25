@@ -16,13 +16,20 @@ class VideoStream:
 
   def __init__(self):
     self.__frame = ""
+    self.__new = False;
 
   def setFrame(self, f):
     self.__frame = f
+    self.__new = True;
 
   @property
   def frame(self):
     return self.__frame
+
+  @property
+  def isNew(self): return self.__new
+  def flagOld(self): self.__new = False;
+
 
 class VideoStreamWorker(threading.Thread):
   '''
@@ -75,10 +82,10 @@ class PictureSocket:
         raise Exception("socket broken")
       t += sent
 
-  def recv(self):
-    while 1:
-      chunk = self.__s.recv(2048)
-      if chunk == '\n': break
+  #def recv(self):
+  #  while 1:
+  #    chunk = self.__s.recv(2048)
+  #    if chunk == '\n': break
 
 class WorkThread(threading.Thread):
   '''
@@ -98,9 +105,10 @@ class WorkThread(threading.Thread):
 
   def run(self):
     while 1:
-      self.__s.recv()
-      img = self.__video.frame
-      self.__s.sendImg(img)
+      if self.__video.isNew:
+        img = self.__video.frame
+        self.__s.sendImg(img)
+        self.__video.flagOld()
 
 
 def main():
