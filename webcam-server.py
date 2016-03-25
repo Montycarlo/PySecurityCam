@@ -106,8 +106,7 @@ class WorkThread(threading.Thread):
   def run(self):
     while 1:
       if self.__video.isNew:
-        img = self.__video.frame
-        self.__s.sendImg(img)
+        self.__s.sendImg(self.__video.frame)
         self.__video.flagOld()
 
 
