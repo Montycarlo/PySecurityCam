@@ -43,6 +43,7 @@ class VideoStreamWorker(threading.Thread):
     '''
     super(VideoStreamWorker, self).__init__()
     self.video = video
+    self.__closed = False;
 
   def run(self):
     '''
@@ -51,11 +52,14 @@ class VideoStreamWorker(threading.Thread):
 
     Specifying the filename as - causes fswebcam to print the img to stout.
     '''
-    while 1:
+    while self.__closed == False:
       PIPE = subprocess.PIPE
       p = subprocess.Popen("fswebcam -p YUYV -d /dev/video0 -i 0 -", shell=True, stderr=PIPE, stdout=PIPE)
       (out, err) = p.communicate()
       self.video.setFrame(out)
+
+  def close(self):
+    self.__closed = True
 
 class PictureSocket:
   '''
@@ -102,13 +106,16 @@ class WorkThread(threading.Thread):
     super(WorkThread, self).__init__()
     self.__s = PictureSocket(sock)
     self.__video = video
+    self.__closed = False
 
   def run(self):
-    while 1:
+    while self.__closed == False:
       if self.__video.isNew:
         self.__s.sendImg(self.__video.frame)
         self.__video.flagOld()
 
+  def close(self):
+    self.__closed = True
 
 def main():
   '''
@@ -121,13 +128,19 @@ def main():
   s.listen(LISTEN_QUEUE_MAX)
 
   v = VideoStream()
-  VideoStreamWorker(v).start()
+  vsw = VideoStreamWorker(v)
+  vsw.start()
 
-  while 1:
-    print "listening..."
-    (cs, ad) = s.accept()
-    print "Connected with %s" % str(ad)
-    wt = WorkThread(cs, v)
-    wt.start()
-
+  wts = []
+  try:
+    while 1:
+      print "listening..."
+      (cs, ad) = s.accept()
+      print "Connected with %s" % str(ad)
+      wt = WorkThread(cs, v)
+      wt.start()
+      wts.append(wt)
+  except KeyboardInterrupt:
+    for w in wts: w.close()
+    vsw.close()
 main()
